@@ -1,42 +1,31 @@
 
 class Solution {
 public:
-    int shipWithinDays(vector<int>& weights, int days) {
-        int low = 0;
-        int high = 0;
-
-        // Minimum capacity = heaviest package
-        // Maximum capacity = total weight
-        for (int w : weights) {
-            low = max(low, w);
-            high += w;
+    int findingDays(vector<int>& weights , int cap){
+        int day = 1;
+        int load = 0;
+        for(int i=0;i<weights.size();i++){
+            if(load+weights[i] > cap){
+                day = day + 1;
+                load = weights[i];
+            }
+            else{
+                load += weights[i];
+            }
         }
 
-        // Binary Search on answer
-        while (low < high) {
-            int mid = low + (high - low) / 2;
+        return day;
+    }
 
-            int requiredDays = 1;
-            int currentWeight = 0;
+    int shipWithinDays(vector<int>& weights, int days) {
+        int low = *max_element(weights.begin(),weights.end());
+        int high = accumulate(weights.begin(),weights.end(),0);
 
-            for (int w : weights) {
-                if (currentWeight + w > mid) {
-                    requiredDays++;
-                    currentWeight = 0;
-                }
-
-                currentWeight += w;
-            }
-
-            // If we can ship within 'days',
-            // try a smaller capacity
-            if (requiredDays <= days) {
-                high = mid;
-            }
-            // Need more capacity
-            else {
-                low = mid + 1;
-            }
+        while(low<=high){
+            int mid = low + (high-low)/2;
+            int no_of_days = findingDays(weights,mid);
+            if(no_of_days <= days) high = mid - 1;
+            else low = mid + 1;
         }
 
         return low;
